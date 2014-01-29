@@ -1,8 +1,13 @@
-#include <cuda.h>
-#include <curand.h>
-
 #include <stdlib.h>
 #include <vector>
+
+// #define __align__(x)
+// #define CUDARTAPI
+// #define __location__(x)
+// #include <cuda.h>
+#include <cuda_runtime.h>
+#include <curand.h>
+
 
 class CURNG{
 public:

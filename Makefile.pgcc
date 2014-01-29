@@ -1,5 +1,5 @@
-CXX = pgCC
-CXXFLAGS = -fast -acc -Minfo=accel -I$(HOME)/boost_1_55_0
+CXX = pgc++
+CXXFLAGS = -fast -acc -Minfo=accel -I$(HOME)/boost_1_55_0 -I/opt/cuda-5.5/include -L/opt/cuda-5.5/lib64
 LIBS =
 
 COMMON = observable.h options.h square_lattice.h
@@ -11,6 +11,9 @@ sw_union_find: sw_union_find.cxx union_find.h
 
 sw_kalentev: sw_kalentev.cxx
 	$(CXX) $(CXXFLAGS) -o sw_kalentev sw_kalentev.cxx $(LIBS)
+
+fill_rand_test : fill_rand.h fill_rand_test.cxx
+	$(CXX) $(CXXFLAGS) fill_rand_test.cxx -lcudart -lcurand -o fill_rand_test
 
 clean:
 	rm -f *.o sw_union_find sw_kalentev
