@@ -6,8 +6,11 @@ COMMON = observable.h options.h square_lattice.h
 
 default: sw_union_find sw_kalentev
 
-sw_union_find : sw_union_find.C union_find.h
-	$(CXX) $(CXXFLAGS) -o sw_union_find sw_union_find.C $(LIBS)
+sw_union_find: sw_union_find.cxx union_find.h
+	$(CXX) $(CXXFLAGS) -o sw_union_find sw_union_find.cxx $(LIBS)
 
-sw_kalentev : sw_kalentev.C
-	$(CXX) $(CXXFLAGS) -o sw_kalentev sw_kalentev.C $(LIBS)
+sw_kalentev: sw_kalentev.cxx
+	$(CXX) $(CXXFLAGS) -o sw_kalentev sw_kalentev.cxx $(LIBS)
+
+clean:
+	rm -f *.o sw_union_find sw_kalentev
