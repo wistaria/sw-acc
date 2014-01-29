@@ -23,6 +23,19 @@ int main(int argc, char* argv[]) {
 
   // sqaure lattice
   square_lattice lattice(p.length);
+  std::vector<boost::array<int, 4> > neighbors(lattice.num_sites());
+  std::vector<boost::array<int, 4> > neighbor_bonds(lattice.num_sites());
+  {
+    std::vector<int> num_neighbors(lattice.num_sites(), 0);
+    for (int b = 0; b < lattice.num_bonds(); ++b) {
+      int s = lattice.source(b);
+      int t = lattice.target(b);
+      neighbors[s][num_neighbors[s]] = t;
+      neighbor_bonds[s][num_neighbors[s]++] = b;
+      neighbors[t][num_neighbors[t]] = s;
+      neighbor_bonds[t][num_neighbors[t]++] = b;
+    }
+  }
 
   // random number generators
   typedef boost::mt19937 engine_t;
@@ -36,6 +49,7 @@ int main(int argc, char* argv[]) {
   std::vector<double> rn(std::max(lattice.num_sites(), lattice.num_bonds()));
 
   // cluster information
+  std::vector<int> active(lattice.num_bonds());
   std::vector<int> label(lattice.num_sites());
 
   // oservables
@@ -57,27 +71,39 @@ int main(int argc, char* argv[]) {
     //
 
     // initialize cluster information
+    for (int b = 0; b < lattice.num_bonds(); ++b) rn[b] = random01();
+    for (int b = 0; b < lattice.num_bonds(); ++b)
+      active[b] =
+        ((spins[lattice.source(b)] == spins[lattice.target(b)]) && (rn[b] < prob)) ? 1 : 0;
     for (int s = 0; s < lattice.num_sites(); ++s) label[s] = s;
 
-    // scan
-    for (int b = 0; b < lattice.num_bonds(); ++b) rn[b] = random01();
-    for (int b = 0; b < lattice.num_bonds(); ++b) {
-      int s = lattice.source(b);
-      int t = lattice.target(b);
-      if (spins[s] == spins[t] && rn[b] < prob) label[s] = label[t] = std::min(s, t);
-    }
-
-    // analysis
-    int rem;
-    do {
-      rem = 0;
+    while (true) {
+      // scan
+      bool converge = true;
       for (int s = 0; s < lattice.num_sites(); ++s) {
-        if (label[label[s]] != label[s]) {
-          label[s] = label[label[s]];
-          ++rem;
+        for (int i = 0; i < 4; ++i) {
+          if (active[neighbor_bonds[s][i]]) {
+            converge &= (label[s] == label[neighbors[s][i]]);
+            label[s] = std::min(label[s], label[neighbors[s][i]]);
+          }
         }
       }
-    } while (rem > 0);
+      if (converge) break;
+
+      // analysis
+      while (true) {
+        bool changed = false;
+        for (int s = 0; s < lattice.num_sites(); ++s) {
+          changed |= (label[label[s]] != label[s]);
+          label[label[s]] = label[s];
+        }
+        if (!changed) break;
+      }
+
+      for (int b = 0; b < lattice.num_bonds(); ++b) {
+      }
+      if (converge) break;
+    }
 
     //
     // cluster flip
