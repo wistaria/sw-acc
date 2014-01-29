@@ -1,0 +1,19 @@
+CXX = nvcc
+CXXFLAGS =  -I$(HOME)/boost_1_55_0
+LIBS = -lnurand
+
+COMMON = observable.h options.h square_lattice.h
+
+default: sw_union_find sw_kalentev
+
+sw_union_find: sw_union_find.cxx union_find.h
+	$(CXX) $(CXXFLAGS) -o sw_union_find sw_union_find.cxx $(LIBS)
+
+sw_kalentev: sw_kalentev.cxx
+	$(CXX) $(CXXFLAGS) -o sw_kalentev sw_kalentev.cxx $(LIBS)
+
+fill_rand_test : fill_rand.h fill_rand_test.cxx
+	$(CXX) $(CXXFLAGS) -o fill_rand_test fill_rand_test.cxx $(LIBS)
+
+clean:
+	rm -f *.o sw_union_find sw_kalentev
