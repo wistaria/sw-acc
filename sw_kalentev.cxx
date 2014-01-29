@@ -37,7 +37,6 @@ int main(int argc, char* argv[]) {
 
   // cluster information
   std::vector<int> label(lattice.num_sites());
-  std::vector<int> cluster_size(lattice.num_sites());
 
   // oservables
   observable num_clusters;
@@ -86,15 +85,12 @@ int main(int argc, char* argv[]) {
 
     // assign cluster id & accumulate cluster properties
     nc = 0;
-    std::fill(cluster_size.begin(), cluster_size.end(), 0);
     for (int s = 0; s < lattice.num_sites(); ++s) {
       if (label[s] == s) ++nc;
-      ++cluster_size[label[s]];
     }
     mag2 = 0;
-    for (int s = 0; s < lattice.num_sites(); ++s) {
-      mag2 += cluster_size[s] * cluster_size[s];
-    }
+    for (int s = 0; s < lattice.num_sites(); ++s) mag2 += 2 * spins[s] - 1;
+    mag2 = mag2 * mag2;
 
     // determine whether clusters are flipped or not
     for (int s = 0; s < lattice.num_sites(); ++s) rn[s] = random01();

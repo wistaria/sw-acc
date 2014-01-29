@@ -76,14 +76,13 @@ int main(int argc, char* argv[]) {
 
     // assign cluster id & accumulate cluster properties
     nc = 0;
-    mag2 = 0;
     for (int f = 0; f < fragments.size(); ++f) {
-      if (fragments[f].is_root()) {
-        fragments[f].set_id(nc++);
-        mag2 += fragments[f].weight() * fragments[f].weight();
-      }
+      if (fragments[f].is_root()) fragments[f].set_id(nc++);
     }
     for (int f = 0; f < fragments.size(); ++f) fragments[f].set_id(cluster_id(fragments, f));
+    mag2 = 0;
+    for (int s = 0; s < lattice.num_sites(); ++s) mag2 += 2 * spins[s] - 1;
+    mag2 = mag2 * mag2;
 
     // determine whether clusters are flipped or not
     for (int s = 0; s < lattice.num_sites(); ++s) rn[s] = random01();
