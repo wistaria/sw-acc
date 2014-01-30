@@ -1,0 +1,5 @@
+CXX = g++
+
+rand_pi_omp : rand_pi_omp.cxx
+	$(CXX) -O3 -fopenmp -I$(HOME)/opt/include -o $@ $<
+
