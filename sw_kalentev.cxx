@@ -79,29 +79,39 @@ int main(int argc, char* argv[]) {
 
     while (true) {
       // scan
-      bool converge = true;
       for (int s = 0; s < lattice.num_sites(); ++s) {
+        int p = lattice.num_sites(); // MAX
         for (int i = 0; i < 4; ++i) {
-          if (active[neighbor_bonds[s][i]]) {
-            converge &= (label[s] == label[neighbors[s][i]]);
-            label[s] = std::min(label[s], label[neighbors[s][i]]);
-          }
+          if (active[neighbor_bonds[s][i]]) p = std::min(p, label[neighbors[s][i]]);
         }
+        if (p < label[s]) label[s] = std::min(label[label[s]], p);
       }
-      if (converge) break;
 
       // analysis
-      while (true) {
-        bool changed = false;
-        for (int s = 0; s < lattice.num_sites(); ++s) {
-          changed |= (label[label[s]] != label[s]);
-          label[label[s]] = label[s];
-        }
-        if (!changed) break;
+      // while (true) {
+      //   bool changed = false;
+      //   for (int s = 0; s < lattice.num_sites(); ++s) {
+      //     changed |= (label[label[s]] != label[s]);
+      //     label[label[s]] = label[s];
+      //   }
+      //   // std::cerr << "changed = " << changed << std::endl;
+      //   if (!changed) break;
+      // }
+      for (int s = 0; s < lattice.num_sites(); ++s) {
+        int p = label[s];
+        while (label[p] != p) p = label[label[p]];
+        label[s] = p;
       }
 
+      bool converge = true;
+      int n = 0;
       for (int b = 0; b < lattice.num_bonds(); ++b) {
+        if (active[b]) {
+          if (label[lattice.source(b)] != label[lattice.target(b)]) ++n;
+          converge &= (label[lattice.source(b)] == label[lattice.target(b)]);
+        }
       }
+      // std::cerr << "n = " << n << std::endl;
       if (converge) break;
     }
 
